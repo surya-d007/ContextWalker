@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "contextwalker"
+version = "0.1.0"
+description = "Local contextual, hybrid, and agentic RAG for PDF documents"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [{name = "ContextWalker Contributors"}]
+dependencies = [
+    "faiss-cpu",
+    "langchain-text-splitters",
+    "numpy",
+    "pymupdf",
+    "rank-bm25",
+    "requests",
+    "rich",
+    "sentence-transformers",
+]
+
+[project.scripts]
+contextwalker = "contextwalker.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

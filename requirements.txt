@@ -1,0 +1,9 @@
+faiss-cpu
+langchain-text-splitters
+numpy
+pymupdf
+rank-bm25
+requests
+rich
+sentence-transformers
+

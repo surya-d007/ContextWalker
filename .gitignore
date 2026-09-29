@@ -1,0 +1,20 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+.DS_Store
+
+# Generated runtime data
+rag_cache/
+
+# The source document may be private or large.
+data.pdf
+
+# Model and test caches
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
