@@ -4,7 +4,7 @@ ContextWalker is a local PDF question-answering system that combines contextual
 chunking, semantic retrieval, BM25 keyword retrieval, Reciprocal Rank Fusion,
 neural reranking, and agent-driven exploration of neighboring chunks.
 
-![ContextWalker agentic RAG architecture](docs/assets/contextwalker-system-architecture.png)
+![ContextWalker agentic RAG architecture](https://raw.githubusercontent.com/surya-d007/ContextWalker/main/docs/assets/contextwalker-system-architecture.png)
 
 This repository is a modular reorganization of `agent_sample.py`. Its retrieval
 and answering logic is intentionally unchanged.
@@ -24,7 +24,9 @@ PDF extraction
   -> supported answer
 ```
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for a module-by-module guide.
+See the
+[architecture guide](https://github.com/surya-d007/ContextWalker/blob/main/docs/ARCHITECTURE.md)
+for a module-by-module explanation.
 
 ## Requirements
 
@@ -34,6 +36,15 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for a module-by-module guide.
 - A PDF named `data.pdf` in the directory from which ContextWalker is run
 
 ## Installation
+
+Install the published package from PyPI:
+
+```bash
+python -m pip install contextwalker
+ollama pull gpt-oss:20b
+```
+
+For local development from a cloned repository:
 
 ```bash
 python -m venv .venv
@@ -87,3 +98,7 @@ python -m compileall -q src
 
 The original `agent_sample.py` remains outside this repository and has not been
 modified.
+
+Release maintainers should follow the
+[publishing guide](https://github.com/surya-d007/ContextWalker/blob/main/docs/PUBLISHING.md)
+for the PyPI release process.
