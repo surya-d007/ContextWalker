@@ -76,10 +76,11 @@ Return only the contextual description.
 def contextualize_chunks(
     chunks: List[Chunk],
     document_summary: str,
+    context_cache_file: str = CONTEXT_CACHE_FILE,
 ) -> List[Chunk]:
-    if os.path.exists(CONTEXT_CACHE_FILE):
+    if os.path.exists(context_cache_file):
         print("\n[CACHE] Loading contextual chunks.")
-        return load_cached_chunks()
+        return load_cached_chunks(context_cache_file)
 
     print("\n[4] Generating context for chunks...")
 
@@ -102,7 +103,7 @@ def contextualize_chunks(
         chunk.context = context
         chunk.contextual_text = context + "\n\n" + chunk.text
 
-    with open(CONTEXT_CACHE_FILE, "w", encoding="utf-8") as file:
+    with open(context_cache_file, "w", encoding="utf-8") as file:
         json.dump(
             [asdict(chunk) for chunk in chunks],
             file,
@@ -111,4 +112,3 @@ def contextualize_chunks(
         )
 
     return chunks
-

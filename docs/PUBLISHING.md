@@ -41,18 +41,18 @@ python -m twine check --strict dist/*
 Optionally install the newly built wheel in a fresh virtual environment before
 publishing.
 
-## Publish version 0.1.0
+## Publish a release
 
-Confirm that `version = "0.1.0"` in `pyproject.toml` and `__version__ =
-"0.1.0"` in `src/contextwalker/__init__.py` agree. Commit and push all release
-changes, then create the tag:
+Confirm that the version in `pyproject.toml` and `__version__` in
+`src/contextwalker/__init__.py` agree. Commit and push all release changes, then
+create a matching tag. For example, to publish version 0.2.0:
 
 ```bash
-git tag -a v0.1.0 -m "ContextWalker 0.1.0"
-git push origin v0.1.0
+git tag -a v0.2.0 -m "ContextWalker 0.2.0"
+git push origin v0.2.0
 ```
 
-On GitHub, create a release using the `v0.1.0` tag and publish it. Publishing
+On GitHub, create a release using the matching tag and publish it. Publishing
 the GitHub release starts `.github/workflows/publish.yml`. The workflow tests
 the project, builds its wheel and source distribution, validates the metadata,
 and publishes through the configured trusted publisher.
@@ -77,4 +77,3 @@ PyPI does not permit replacing an existing release file. For every release:
 3. Commit and push the changes.
 4. Create a matching `vX.Y.Z` tag.
 5. Publish a GitHub release from that tag.
-

@@ -9,6 +9,7 @@ src/contextwalker/
 ├── agent/       # Neighbor-chunk tool and Ollama exploration loop
 ├── document/    # PDF extraction, summary, chunking, context, and cache
 ├── retrieval/   # Embeddings, FAISS, BM25, fusion, and reranking
+├── api.py        # Public ContextWalker class and ask_pdf helper
 ├── cli.py       # Interactive terminal interface
 ├── config.py    # Original constants and cache paths
 ├── pipeline.py  # System construction and query orchestration

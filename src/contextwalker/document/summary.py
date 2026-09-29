@@ -5,10 +5,13 @@ from contextwalker.config import SUMMARY_CACHE_FILE
 from contextwalker.ollama import ollama_generate
 
 
-def create_document_summary(pages: List[Dict]) -> str:
-    if os.path.exists(SUMMARY_CACHE_FILE):
+def create_document_summary(
+    pages: List[Dict],
+    summary_cache_file: str = SUMMARY_CACHE_FILE,
+) -> str:
+    if os.path.exists(summary_cache_file):
         print("[CACHE] Loading document summary.")
-        with open(SUMMARY_CACHE_FILE, "r", encoding="utf-8") as file:
+        with open(summary_cache_file, "r", encoding="utf-8") as file:
             return file.read()
 
     print("\n[2] Creating document summary...")
@@ -45,8 +48,7 @@ DOCUMENT DESCRIPTION:
 
     summary = ollama_generate(prompt, temperature=0, max_tokens=700)
 
-    with open(SUMMARY_CACHE_FILE, "w", encoding="utf-8") as file:
+    with open(summary_cache_file, "w", encoding="utf-8") as file:
         file.write(summary)
 
     return summary
-

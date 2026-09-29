@@ -9,6 +9,7 @@ from contextwalker.config import (
     FINAL_TOP_K,
     FUSED_TOP_K,
     PDF_PATH,
+    SUMMARY_CACHE_FILE,
     VECTOR_TOP_K,
 )
 from contextwalker.document.cache import load_cached_chunks
@@ -92,18 +93,28 @@ def search(
     return answer, final_results
 
 
-def build_system():
-    if os.path.exists(CONTEXT_CACHE_FILE):
+def build_system(
+    pdf_path: str = PDF_PATH,
+    context_cache_file: str = CONTEXT_CACHE_FILE,
+    summary_cache_file: str = SUMMARY_CACHE_FILE,
+):
+    if os.path.exists(context_cache_file):
         print("\n[CACHE] Found existing contextual_chunks.json")
-        chunks = load_cached_chunks()
+        chunks = load_cached_chunks(context_cache_file)
     else:
-        pages = extract_pdf(PDF_PATH)
-        document_summary = create_document_summary(pages)
+        pages = extract_pdf(pdf_path)
+        document_summary = create_document_summary(
+            pages,
+            summary_cache_file,
+        )
         chunks = chunk_pages(pages)
-        chunks = contextualize_chunks(chunks, document_summary)
+        chunks = contextualize_chunks(
+            chunks,
+            document_summary,
+            context_cache_file,
+        )
 
     index, vector_row_map = create_faiss_index(chunks)
     bm25, bm25_row_map = create_bm25(chunks)
 
     return index, vector_row_map, bm25, bm25_row_map, chunks
-

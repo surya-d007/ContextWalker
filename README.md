@@ -68,6 +68,51 @@ python -m contextwalker
 
 Type `exit`, `quit`, or `q` to stop the interactive prompt.
 
+## Python API
+
+ContextWalker can also be embedded directly in another Python application. Pass
+the PDF and a dedicated cache directory, build once, and reuse the same indexes
+for multiple questions:
+
+```python
+from contextwalker import ContextWalker
+
+rag = ContextWalker(
+    pdf_path="manual.pdf",
+    cache_dir="./manual_cache",
+)
+
+rag.build()
+
+answer = rag.ask("What does MHL mean?")
+print(answer)
+
+answer, results = rag.ask(
+    "Which page explains the setup process?",
+    return_results=True,
+)
+
+for result in results:
+    print(result["chunk_id"], result["reranker_score"])
+```
+
+Calling `ask()` before `build()` automatically builds the system. For a
+single-question script, use the convenience function:
+
+```python
+from contextwalker import ask_pdf
+
+answer = ask_pdf(
+    pdf_path="manual.pdf",
+    question="Summarize the installation procedure.",
+    cache_dir="./manual_cache",
+)
+```
+
+Use a different cache directory for each PDF. ContextWalker deliberately
+preserves the original cache behavior and does not automatically invalidate a
+cache when the source PDF changes.
+
 ## Runtime cache
 
 The first run creates `rag_cache/document_summary.txt` and

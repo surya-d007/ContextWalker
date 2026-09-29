@@ -5,8 +5,10 @@ from contextwalker.config import CONTEXT_CACHE_FILE
 from contextwalker.schema import Chunk
 
 
-def load_cached_chunks() -> List[Chunk]:
-    with open(CONTEXT_CACHE_FILE, "r", encoding="utf-8") as file:
+def load_cached_chunks(
+    context_cache_file: str = CONTEXT_CACHE_FILE,
+) -> List[Chunk]:
+    with open(context_cache_file, "r", encoding="utf-8") as file:
         data = json.load(file)
 
     chunks = []
@@ -30,4 +32,3 @@ def load_cached_chunks() -> List[Chunk]:
 
     print(f"[OK] Loaded {len(chunks)} chunks.")
     return chunks
-
