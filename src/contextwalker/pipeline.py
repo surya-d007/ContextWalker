@@ -98,10 +98,28 @@ def build_system(
     context_cache_file: str = CONTEXT_CACHE_FILE,
     summary_cache_file: str = SUMMARY_CACHE_FILE,
 ):
+    chunks = None
+
     if os.path.exists(context_cache_file):
         print("\n[CACHE] Found existing contextual_chunks.json")
-        chunks = load_cached_chunks(context_cache_file)
-    else:
+        try:
+            cached_chunks = load_cached_chunks(context_cache_file)
+            missing_count = sum(
+                1 for chunk in cached_chunks if not chunk.context.strip()
+            )
+            if cached_chunks and missing_count == 0:
+                chunks = cached_chunks
+            elif not cached_chunks:
+                print("[CACHE] Context cache is empty; rebuilding it.")
+            else:
+                print(
+                    f"[CACHE] Found {missing_count} chunks with missing "
+                    "context; repairing the cache."
+                )
+        except (OSError, TypeError, ValueError, KeyError) as error:
+            print(f"[WARN] Context cache is invalid; rebuilding it: {error}")
+
+    if chunks is None:
         pages = extract_pdf(pdf_path)
         document_summary = create_document_summary(
             pages,

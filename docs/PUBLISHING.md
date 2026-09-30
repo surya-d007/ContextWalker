@@ -45,11 +45,11 @@ publishing.
 
 Confirm that the version in `pyproject.toml` and `__version__` in
 `src/contextwalker/__init__.py` agree. Commit and push all release changes, then
-create a matching tag. For example, to publish version 0.2.0:
+create a matching tag. For example, to publish version 0.2.1:
 
 ```bash
-git tag -a v0.2.0 -m "ContextWalker 0.2.0"
-git push origin v0.2.0
+git tag -a v0.2.1 -m "ContextWalker 0.2.1"
+git push origin v0.2.1
 ```
 
 On GitHub, create a release using the matching tag and publish it. Publishing

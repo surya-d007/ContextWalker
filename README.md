@@ -7,7 +7,8 @@ neural reranking, and agent-driven exploration of neighboring chunks.
 ![ContextWalker agentic RAG architecture](https://raw.githubusercontent.com/surya-d007/ContextWalker/main/docs/assets/contextwalker-system-architecture.png)
 
 This repository is a modular reorganization of `agent_sample.py`. Its retrieval
-and answering logic is intentionally unchanged.
+and answering algorithms remain unchanged, with additional validation around
+Ollama generation and persistent caches.
 
 ## How it works
 
@@ -109,16 +110,21 @@ answer = ask_pdf(
 )
 ```
 
-Use a different cache directory for each PDF. ContextWalker deliberately
-preserves the original cache behavior and does not automatically invalidate a
-cache when the source PDF changes.
+Use a different cache directory for each PDF. ContextWalker reuses complete
+entries and regenerates missing contexts. It does not automatically invalidate
+a complete cache when the source PDF changes.
 
 ## Runtime cache
 
 The first run creates `rag_cache/document_summary.txt` and
-`rag_cache/contextual_chunks.json`. Later runs reuse the contextual chunks but
-rebuild the in-memory FAISS and BM25 indexes. Delete `rag_cache/` when changing
-the PDF or chunk-generation settings.
+`rag_cache/contextual_chunks.json`. Later runs reuse complete contextual chunks
+but rebuild the in-memory FAISS and BM25 indexes. If a run is interrupted or
+Ollama fails, the next run resumes by generating only missing contexts. Cache
+writes are atomic, so an interrupted write cannot leave invalid JSON.
+
+Context generation requests low reasoning from `gpt-oss` and retries empty or
+token-limited responses with a larger output allowance. A chunk is never
+accepted as complete unless Ollama returns a non-empty final response.
 
 ## Configuration
 

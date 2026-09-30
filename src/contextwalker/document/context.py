@@ -1,10 +1,8 @@
-import json
 import os
-from dataclasses import asdict
 from typing import List
 
 from contextwalker.config import CONTEXT_CACHE_FILE
-from contextwalker.document.cache import load_cached_chunks
+from contextwalker.document.cache import load_cached_chunks, save_cached_chunks
 from contextwalker.ollama import ollama_generate
 from contextwalker.schema import Chunk
 
@@ -70,7 +68,7 @@ NEXT TEXT:
 Return only the contextual description.
 """
 
-    return ollama_generate(prompt, temperature=0, max_tokens=180)
+    return ollama_generate(prompt, temperature=0, max_tokens=500)
 
 
 def contextualize_chunks(
@@ -78,14 +76,46 @@ def contextualize_chunks(
     document_summary: str,
     context_cache_file: str = CONTEXT_CACHE_FILE,
 ) -> List[Chunk]:
+    cached_by_key = {}
+
     if os.path.exists(context_cache_file):
         print("\n[CACHE] Loading contextual chunks.")
-        return load_cached_chunks(context_cache_file)
+        try:
+            cached_chunks = load_cached_chunks(context_cache_file)
+            cached_by_key = {
+                (chunk.chunk_id, chunk.page, chunk.text): chunk
+                for chunk in cached_chunks
+                if chunk.context.strip()
+            }
+        except (OSError, TypeError, ValueError, KeyError) as error:
+            print(f"[WARN] Ignoring invalid context cache: {error}")
 
-    print("\n[4] Generating context for chunks...")
+    reused = 0
+    for chunk in chunks:
+        cached = cached_by_key.get((chunk.chunk_id, chunk.page, chunk.text))
+        if cached is None:
+            continue
 
-    for i, chunk in enumerate(chunks):
-        print(f"[CONTEXT] {i + 1}/{len(chunks)}")
+        chunk.context = cached.context.strip()
+        chunk.contextual_text = f"{chunk.context}\n\n{chunk.text}"
+        reused += 1
+
+    missing_chunks = [chunk for chunk in chunks if not chunk.context.strip()]
+
+    if reused:
+        print(f"[CACHE] Reusing {reused} complete contextual chunks.")
+
+    if not missing_chunks:
+        print("[CACHE] All contextual chunks are complete.")
+        return chunks
+
+    print(
+        "\n[4] Generating context for "
+        f"{len(missing_chunks)} missing chunks..."
+    )
+
+    for i, chunk in enumerate(missing_chunks):
+        print(f"[CONTEXT] {i + 1}/{len(missing_chunks)} (chunk {chunk.chunk_id})")
 
         try:
             context = generate_context_for_chunk(
@@ -94,21 +124,21 @@ def contextualize_chunks(
                 document_summary,
             )
         except Exception as error:
-            print(
-                "[WARN] Context "
-                f"generation failed for chunk {chunk.chunk_id}: {error}"
+            raise RuntimeError(
+                "Context generation failed for chunk "
+                f"{chunk.chunk_id}. Completed chunks were saved and the "
+                "next run will resume from this chunk."
+            ) from error
+
+        context = context.strip()
+        if not context:
+            raise RuntimeError(
+                f"Context generation returned empty text for chunk "
+                f"{chunk.chunk_id}; the incomplete result was not accepted."
             )
-            context = ""
 
         chunk.context = context
-        chunk.contextual_text = context + "\n\n" + chunk.text
-
-    with open(context_cache_file, "w", encoding="utf-8") as file:
-        json.dump(
-            [asdict(chunk) for chunk in chunks],
-            file,
-            indent=2,
-            ensure_ascii=False,
-        )
+        chunk.contextual_text = f"{context}\n\n{chunk.text}"
+        save_cached_chunks(chunks, context_cache_file)
 
     return chunks

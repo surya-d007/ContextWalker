@@ -12,7 +12,10 @@ def create_document_summary(
     if os.path.exists(summary_cache_file):
         print("[CACHE] Loading document summary.")
         with open(summary_cache_file, "r", encoding="utf-8") as file:
-            return file.read()
+            cached_summary = file.read().strip()
+        if cached_summary:
+            return cached_summary
+        print("[WARN] Cached document summary is empty; regenerating it.")
 
     print("\n[2] Creating document summary...")
     sample_text = ""

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "contextwalker"
-version = "0.2.0"
+version = "0.2.1"
 description = "Local contextual, hybrid, and agentic RAG for PDF documents"
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.9"
